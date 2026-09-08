@@ -2,6 +2,7 @@ import 'package:absensiadmin/absensi/absen.dart';
 import 'package:absensiadmin/groupjadwal/groupjadwal.dart';
 import 'package:absensiadmin/karyawanAbsen/karyawan_absen_page.dart';
 import 'package:absensiadmin/lembur/lemburPage.dart';
+import 'package:absensiadmin/master_data/master_data_page.dart';
 import 'package:absensiadmin/payroll/payroll.dart';
 import 'package:flutter/material.dart';
 
@@ -298,6 +299,24 @@ class Home extends StatelessWidget {
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         const GroupJadwalPage(),
+                                  ),
+                                );
+                              },
+                            ),
+
+                            // =========================
+                            // MASTER DATA
+                            // =========================
+                            _MenuCard(
+                              title: 'Master Data',
+                              subtitle: 'Kelola data dasar sistem',
+                              icon: Icons.storage_outlined,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const MasterDataPage(),
                                   ),
                                 );
                               },

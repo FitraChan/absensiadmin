@@ -334,13 +334,16 @@ class _DetailGroupJadwalPageState extends State<DetailGroupJadwalPage>
       datang = value(
         getValue(Map<String, dynamic>.from(jamKerja), [
           'datang',
-          'jam_masuk',
-          'jam_datang',
+          'waktu_mulai',
+          'waktu_mulai',
         ]),
       );
 
       pulang = value(
-        getValue(Map<String, dynamic>.from(jamKerja), ['pulang', 'jam_pulang']),
+        getValue(Map<String, dynamic>.from(jamKerja), [
+          'waktu_akhir',
+          'waktu_akhir',
+        ]),
       );
     }
 

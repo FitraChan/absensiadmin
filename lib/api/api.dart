@@ -29,6 +29,16 @@ class Network {
     );
   }
 
+  Future<http.Response> putData(dynamic data, String addr) async {
+    final fullUrl = apiUrl + addr; // Ambil token dari
+    await _getToken();
+    return await http.put(
+      Uri.parse(fullUrl),
+      body: jsonEncode(data),
+      headers: _setHeaders(),
+    );
+  }
+
   getData(addr) async {
     //var fullUrl = _url + apiUrl;
     var fullUrl = apiUrl + addr;
