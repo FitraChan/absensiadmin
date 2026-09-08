@@ -38,6 +38,14 @@ class Network {
     return await http.get(Uri.parse(fullUrl), headers: _setHeaders());
   }
 
+  deleteData(addr) async {
+    var fullUrl = apiUrl + addr;
+
+    await _getToken();
+
+    return await http.delete(Uri.parse(fullUrl), headers: _setHeaders());
+  }
+
   Future<Uri> getUriParse(String addr) async {
     final fullUrl = apiUrl + addr;
 

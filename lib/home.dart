@@ -1,4 +1,7 @@
 import 'package:absensiadmin/absensi/absen.dart';
+import 'package:absensiadmin/groupjadwal/groupjadwal.dart';
+import 'package:absensiadmin/karyawanAbsen/karyawan_absen_page.dart';
+import 'package:absensiadmin/lembur/lemburPage.dart';
 import 'package:absensiadmin/payroll/payroll.dart';
 import 'package:flutter/material.dart';
 
@@ -248,12 +251,55 @@ class Home extends StatelessWidget {
                             ),
 
                             _MenuCard(
-                              title: 'Pengaturan',
-                              subtitle: 'Kelola pengaturan sistem',
-                              icon: Icons.settings_outlined,
+                              title: 'Lembur',
+                              subtitle: 'Kelola data lembur karyawan',
+                              icon: Icons.work_outline,
 
                               onTap: () {
-                                // Pengaturan
+                                // Lembur
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const LemburPage(),
+                                  ),
+                                );
+                              },
+                            ),
+
+                            // =========================
+                            // KARYAWAN ABSEN
+                            // =========================
+                            _MenuCard(
+                              title: 'Karyawan Absen',
+                              subtitle: 'Kelola izin, sakit, alpha dan cuti',
+                              icon: Icons.event_available_outlined,
+
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const KaryawanAbsenPage(),
+                                  ),
+                                );
+                              },
+                            ),
+
+                            _MenuCard(
+                              title: 'Group Jadwal',
+                              subtitle:
+                                  'Kelola group dan jadwal kerja karyawan',
+                              icon: Icons.calendar_month_outlined,
+
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const GroupJadwalPage(),
+                                  ),
+                                );
                               },
                             ),
                           ],
