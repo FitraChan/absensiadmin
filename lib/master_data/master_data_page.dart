@@ -1,6 +1,9 @@
+import 'package:absensiadmin/master_data/aturan_potongan/aturan_potongan_page.dart';
+import 'package:absensiadmin/master_data/item_gaji/item_gaji_page.dart';
 import 'package:absensiadmin/master_data/jam_kerja/jam_kerja_page.dart';
 import 'package:absensiadmin/master_data/karyawan/karyawan_page.dart';
 import 'package:absensiadmin/master_data/periode_gaji/periode_gaji_page.dart';
+import 'package:absensiadmin/master_data/set_payroll/set_payroll_page.dart';
 import 'package:flutter/material.dart';
 
 class MasterDataPage extends StatelessWidget {
@@ -78,6 +81,54 @@ class MasterDataPage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => const PeriodeGajiPage(),
+                      ),
+                    );
+                  },
+                ),
+
+                _MasterMenuCard(
+                  title: 'Setting Gaji',
+                  subtitle: 'Atur item dan nominal payroll',
+                  icon: Icons.request_quote_outlined,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SetPayrollPage(),
+                      ),
+                    );
+                  },
+                ),
+
+                // =========================
+                // ITEM GAJI
+                // =========================
+                _MasterMenuCard(
+                  title: 'Item Gaji',
+                  subtitle: 'Kelola komponen dan kategori gaji',
+                  icon: Icons.account_balance_wallet_outlined,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ItemGajiPage(),
+                      ),
+                    );
+                  },
+                ),
+
+                // =========================
+                // ATURAN POTONGAN
+                // =========================
+                _MasterMenuCard(
+                  title: 'Aturan Potongan',
+                  subtitle: 'Atur ketentuan dan nilai potongan gaji',
+                  icon: Icons.rule_outlined,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AturanPotonganPage(),
                       ),
                     );
                   },

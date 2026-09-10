@@ -109,6 +109,62 @@ class _DetailGroupJadwalPageState extends State<DetailGroupJadwalPage>
     }
   }
 
+  List<dynamic> dataJamKerja = [];
+
+  Future<void> getJamKerja() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final response = await Network().getData('jam-kerja');
+
+      debugPrint('================================');
+      debugPrint('GET JAM KERJA');
+      debugPrint('STATUS: ${response.statusCode}');
+      debugPrint('BODY: ${response.body}');
+      debugPrint('================================');
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+
+        if (body['success'] == true) {
+          final data = body['data'];
+
+          // Karena Laravel paginate() menghasilkan object
+          // bukan langsung List
+          if (data is Map && data['data'] is List) {
+            setState(() {
+              dataJamKerja = List<dynamic>.from(data['data']);
+            });
+          } else {
+            setState(() {
+              dataJamKerja = [];
+            });
+          }
+        } else {
+          setState(() {
+            dataJamKerja = [];
+          });
+        }
+      } else {
+        setState(() {
+          dataJamKerja = [];
+        });
+      }
+    } catch (e) {
+      debugPrint('ERROR GET JAM KERJA: $e');
+
+      setState(() {
+        dataJamKerja = [];
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   void _showError(String message) {
     if (!mounted) return;
 
@@ -282,35 +338,65 @@ class _DetailGroupJadwalPageState extends State<DetailGroupJadwalPage>
   Widget _jamKerjaTab() {
     return RefreshIndicator(
       onRefresh: getDetailGroup,
-      child: detailGroupJadwal.isEmpty
-          ? ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                const SizedBox(height: 100),
-                _emptySection(
-                  icon: Icons.access_time,
-                  title: 'Belum Ada Jam Kerja',
-                  subtitle:
-                      'Belum ada jadwal kerja yang ditambahkan ke group ini.',
-                ),
-              ],
-            )
-          : ListView.builder(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16),
-              itemCount: detailGroupJadwal.length,
-              itemBuilder: (context, index) {
-                final item = detailGroupJadwal[index];
-
-                if (item is! Map) {
-                  return const SizedBox();
-                }
-
-                final data = Map<String, dynamic>.from(item);
-
-                return _jamKerjaCard(data, index);
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        children: [
+          // ==========================================
+          // TOMBOL TAMBAH JAM KERJA
+          // ==========================================
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                _showTambahJamKerja();
               },
+              icon: const Icon(Icons.add, size: 20),
+              label: const Text(
+                'Tambah Jam Kerja',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xff1976D2),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // ==========================================
+          // DATA KOSONG
+          // ==========================================
+          if (detailGroupJadwal.isEmpty)
+            _emptySection(
+              icon: Icons.access_time,
+              title: 'Belum Ada Jam Kerja',
+              subtitle: 'Belum ada jadwal kerja yang ditambahkan ke group ini.',
+            ),
+
+          // ==========================================
+          // DATA JAM KERJA
+          // ==========================================
+          if (detailGroupJadwal.isNotEmpty)
+            ...List.generate(detailGroupJadwal.length, (index) {
+              final item = detailGroupJadwal[index];
+
+              if (item is! Map) {
+                return const SizedBox();
+              }
+
+              final data = Map<String, dynamic>.from(item);
+
+              return _jamKerjaCard(data, index);
+            }),
+        ],
+      ),
     );
   }
 
@@ -446,6 +532,124 @@ class _DetailGroupJadwalPageState extends State<DetailGroupJadwalPage>
           ],
         ),
       ),
+    );
+  }
+
+  dynamic selectedJamKerja;
+  bool isLoadingJamKerja = false;
+  Future<void> _showTambahJamKerja() async {
+    await getJamKerja();
+
+    if (!mounted) return;
+
+    final namaGrup = value(getValue(groupData!, ['nama_grup', 'namaGrup']));
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: StatefulBuilder(
+            builder: (context, setModalState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Tambah Jam Kerja',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  const Text(
+                    'Pilih jam kerja yang akan ditambahkan ke group ini.',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 20),
+
+                  Text(
+                    namaGrup,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  DropdownButtonFormField<dynamic>(
+                    value: selectedJamKerja,
+                    decoration: InputDecoration(
+                      labelText: 'Jam Kerja',
+                      hintText: 'Pilih jam kerja',
+                      prefixIcon: const Icon(Icons.access_time),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    items: dataJamKerja.map<DropdownMenuItem<dynamic>>((item) {
+                      return DropdownMenuItem<dynamic>(
+                        value: item['id'],
+                        child: Text(item['nama_shift']?.toString() ?? '-'),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setModalState(() {
+                        selectedJamKerja = value;
+                      });
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (selectedJamKerja == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Silakan pilih jam kerja terlebih dahulu.',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+
+                        print('Jam kerja dipilih: $selectedJamKerja');
+
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xff1976D2),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('Simpan'),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
